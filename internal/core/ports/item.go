@@ -4,6 +4,8 @@ import (
 	"context"
 	"invoice-system/internal/core/domain/dto"
 	"invoice-system/internal/core/domain/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ItemRepository interface {
@@ -16,4 +18,10 @@ type ItemUsecase interface {
 	CreateItemUsecase(ctx context.Context, item dto.ItemRequest) (*dto.ItemResponse, error)
 	FindItemsUsecase(ctx context.Context) ([]models.Item, error)
 	GetItemUsecase(ctx context.Context, itemID int) (*dto.ItemResponse, error)
+}
+
+type ItemHandler interface {
+	FindItemsHandler(c *gin.Context)
+	GetItemHandler(c *gin.Context)
+	CreateItemHandler(c *gin.Context)
 }

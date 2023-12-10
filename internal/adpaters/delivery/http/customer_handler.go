@@ -13,38 +13,38 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type itemHandlerImpl struct {
-	itemUsecase ports.ItemUsecase
-	validation  *validator.Validate
-	wg          sync.WaitGroup
+type customerHandlerImpl struct {
+	customerUsecase ports.CustomerUsecase
+	validation      *validator.Validate
+	wg              sync.WaitGroup
 }
 
-func NewItemHandler(itemUsecase ports.ItemUsecase) ports.ItemHandler {
-	return &itemHandlerImpl{itemUsecase, validator.New(), sync.WaitGroup{}}
+func NewCustomerHandler(customerUsecase ports.CustomerUsecase) ports.CustomerHandler {
+	return &customerHandlerImpl{customerUsecase, validator.New(), sync.WaitGroup{}}
 }
 
-func (h *itemHandlerImpl) FindItemsHandler(c *gin.Context) {
+func (h *customerHandlerImpl) FindCustomersHandler(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
 
 	h.wg.Add(1)
 	go func() {
 		defer h.wg.Done()
-		itemsResponse, err := h.itemUsecase.FindItemsUsecase(ctx)
+		customersResponse, err := h.customerUsecase.FindCustomersUsecase(ctx)
 		if err != nil {
 			errResponse := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
 			c.JSON(http.StatusBadRequest, errResponse)
 			return
 		}
-		response := dto.SuccessResult{Code: http.StatusOK, Data: itemsResponse}
+		response := dto.SuccessResult{Code: http.StatusOK, Data: customersResponse}
 		c.JSON(http.StatusOK, response)
 	}()
 	h.wg.Wait()
 
 }
 
-func (h *itemHandlerImpl) CreateItemHandler(c *gin.Context) {
-	var request dto.ItemRequest
+func (h *customerHandlerImpl) CreateCustomerHandler(c *gin.Context) {
+	var request dto.CustomerRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		errResponse := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
@@ -65,23 +65,23 @@ func (h *itemHandlerImpl) CreateItemHandler(c *gin.Context) {
 	h.wg.Add(1)
 	go func() {
 		defer h.wg.Done()
-		itemResponse, err := h.itemUsecase.CreateItemUsecase(ctx, request)
+		customerResponse, err := h.customerUsecase.CreateCustomerUsecase(ctx, request)
 		if err != nil {
 			errResponse := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
 			c.JSON(http.StatusBadRequest, errResponse)
 			return
 		}
 
-		response := dto.SuccessResult{Code: http.StatusOK, Data: itemResponse}
+		response := dto.SuccessResult{Code: http.StatusOK, Data: customerResponse}
 		c.JSON(http.StatusOK, response)
 	}()
 	h.wg.Wait()
 }
 
-func (h *itemHandlerImpl) GetItemHandler(c *gin.Context) {
+func (h *customerHandlerImpl) GetCustomerHandler(c *gin.Context) {
 	strID := c.Param("id")
 
-	itemID, err := strconv.Atoi(strID)
+	customerID, err := strconv.Atoi(strID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 		return
@@ -92,13 +92,13 @@ func (h *itemHandlerImpl) GetItemHandler(c *gin.Context) {
 	h.wg.Add(1)
 	go func() {
 		defer h.wg.Done()
-		itemsResponse, err := h.itemUsecase.GetItemUsecase(ctx, itemID)
+		customersResponse, err := h.customerUsecase.GetCustomerUsecase(ctx, customerID)
 		if err != nil {
 			errResponse := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
 			c.JSON(http.StatusBadRequest, errResponse)
 			return
 		}
-		response := dto.SuccessResult{Code: http.StatusOK, Data: itemsResponse}
+		response := dto.SuccessResult{Code: http.StatusOK, Data: customersResponse}
 		c.JSON(http.StatusOK, response)
 	}()
 	h.wg.Wait()

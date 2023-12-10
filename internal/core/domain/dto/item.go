@@ -5,10 +5,6 @@ type ItemRequest struct {
 	Type string `json:"type" validate:"required"`
 }
 
-type ItemRequestID struct {
-	ID int `json:"id" validate:"required"`
-}
-
 type ItemResponse struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
