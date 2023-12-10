@@ -5,6 +5,7 @@ import (
 	"invoice-system/internal/core/domain/dto"
 	"invoice-system/internal/core/ports"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -75,4 +76,31 @@ func (h *itemHandlerImpl) CreateItemHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, response)
 	}()
 	h.wg.Wait()
+}
+
+func (h *itemHandlerImpl) GetItemHandler(c *gin.Context) {
+	strID := c.Param("id")
+
+	itemID, err := strconv.Atoi(strID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
+		return
+	}
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
+
+	h.wg.Add(1)
+	go func() {
+		defer h.wg.Done()
+		itemsResponse, err := h.itemUsecase.GetItemUsecase(ctx, itemID)
+		if err != nil {
+			errResponse := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
+			c.JSON(http.StatusBadRequest, errResponse)
+			return
+		}
+		response := dto.SuccessResult{Code: http.StatusOK, Data: itemsResponse}
+		c.JSON(http.StatusOK, response)
+	}()
+	h.wg.Wait()
+
 }

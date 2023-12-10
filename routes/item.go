@@ -17,4 +17,5 @@ func ItemRoutes(r *gin.RouterGroup) {
 
 	r.POST("/item", h.CreateItemHandler)
 	r.GET("/item", h.FindItemsHandler)
+	r.GET("/item/:id", h.GetItemHandler)
 }

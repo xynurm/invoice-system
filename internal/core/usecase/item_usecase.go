@@ -45,3 +45,19 @@ func (u *itemUsecaseImpl) FindItemsUsecase(ctx context.Context) ([]models.Item, 
 
 	return data, err
 }
+
+func (u *itemUsecaseImpl) GetItemUsecase(ctx context.Context, itemID int) (*dto.ItemResponse, error) {
+	data, err := u.itemRepository.GetItemRepository(ctx, itemID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := &dto.ItemResponse{
+		ID:   data.ID,
+		Name: data.Name,
+		Type: data.Type,
+	}
+
+	return response, err
+}
