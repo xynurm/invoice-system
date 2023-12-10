@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"invoice-system/internal/core/domain/models"
 	"invoice-system/internal/core/ports"
 
@@ -78,6 +79,10 @@ func (r *repository) GetItemRepository(ctx context.Context, itemID int) (models.
 
 func (r *repository) CreateItemRepository(ctx context.Context, item models.Item) (models.Item, error) {
 	var err error
+
+	if item.Name == "" {
+		return models.Item{}, errors.New("Bad Request: Name is required")
+	}
 
 	tx := r.db.WithContext(ctx).Begin()
 

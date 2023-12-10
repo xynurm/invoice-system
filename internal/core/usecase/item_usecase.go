@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"invoice-system/internal/core/domain/dto"
 	"invoice-system/internal/core/domain/models"
 	"invoice-system/internal/core/ports"
@@ -21,6 +22,9 @@ func (u *itemUsecaseImpl) CreateItemUsecase(ctx context.Context, req dto.ItemReq
 		Type: req.Type,
 	}
 
+	if createItem.Name == "" {
+		return nil, errors.New("Bad Request: Name is required")
+	}
 	data, err := u.itemRepository.CreateItemRepository(ctx, createItem)
 
 	if err != nil {
