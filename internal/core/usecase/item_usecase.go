@@ -35,3 +35,13 @@ func (u *itemUsecaseImpl) CreateItemUsecase(ctx context.Context, req dto.ItemReq
 
 	return response, err
 }
+
+func (u *itemUsecaseImpl) FindItemsUsecase(ctx context.Context) ([]models.Item, error) {
+	data, err := u.itemRepository.FindItemsRepository(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, err
+}

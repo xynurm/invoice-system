@@ -22,6 +22,26 @@ func NewItemHandler(itemUsecase ports.ItemUsecase) *itemHandlerImpl {
 	return &itemHandlerImpl{itemUsecase, validator.New(), sync.WaitGroup{}}
 }
 
+func (h *itemHandlerImpl) FindItemsHandler(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
+
+	h.wg.Add(1)
+	go func() {
+		defer h.wg.Done()
+		itemsResponse, err := h.itemUsecase.FindItemsUsecase(ctx)
+		if err != nil {
+			errResponse := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
+			c.JSON(http.StatusBadRequest, errResponse)
+			return
+		}
+		response := dto.SuccessResult{Code: http.StatusOK, Data: itemsResponse}
+		c.JSON(http.StatusOK, response)
+	}()
+	h.wg.Wait()
+
+}
+
 func (h *itemHandlerImpl) CreateItemHandler(c *gin.Context) {
 	var request dto.ItemRequest
 
@@ -54,6 +74,5 @@ func (h *itemHandlerImpl) CreateItemHandler(c *gin.Context) {
 		response := dto.SuccessResult{Code: http.StatusOK, Data: itemResponse}
 		c.JSON(http.StatusOK, response)
 	}()
-
 	h.wg.Wait()
 }
